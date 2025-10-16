@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Quote Generator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s ease;
+        }
+        .quote-card {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
+        .quote-enter {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Container -->
+    <div id="app" class="w-full max-w-xl">
+
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-10 text-gray-800 tracking-tight">
+            Daily Inspiration
+        </h1>
+
+        <!-- Quote Card -->
+        <div id="quoteCard" class="quote-card bg-white p-6 sm:p-10 rounded-2xl border-b-4 border-indigo-500">
+            <p id="quoteText" class="text-xl sm:text-2xl font-medium italic text-gray-700 mb-6 relative quote-enter">
+                "Loading inspiration..."
+            </p>
+            <p id="quoteAuthor" class="text-base sm:text-lg font-semibold text-indigo-600 text-right mr-2 quote-enter">
+                — Generator
+            </p>
+        </div>
+
+        <!-- Button -->
+        <div class="mt-8 text-center">
+            <button id="generateBtn" 
+                    class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 
+                           text-white font-bold py-3 px-8 rounded-full shadow-lg 
+                           transition duration-150 ease-in-out transform hover:scale-105 
+                           focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 
+                           w-full sm:w-auto text-lg">
+                Generate New Quote
+            </button>
+        </div>
+
+        <!-- Hidden Message Box for alerts (instead of alert()) -->
+        <div id="messageBox" class="fixed top-0 left-1/2 -translate-x-1/2 mt-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+            <div id="messageText" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-xl">
+                Error occurred.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein" },
+            { text: "The mind is everything. What you think you become.", author: "Buddha" },
+            { text: "If you want to lift yourself up, lift up someone else.", author: "Booker T. Washington" },
+            { text: "Innovation distinguishes between a leader and a follower.", author: "Peter Drucker" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+            { text: "Eighty percent of success is showing up.", author: "Woody Allen" },
+            { text: "Do what you can, with what you have, where you are.", author: "Theodore Roosevelt" }
+        ];
+
+        let lastIndex = -1; // To ensure the next quote is different
+
+        const quoteTextElement = document.getElementById('quoteText');
+        const quoteAuthorElement = document.getElementById('quoteAuthor');
+        const generateBtn = document.getElementById('generateBtn');
+
+        /**
+         * Utility function to show a temporary message.
+         * @param {string} message 
+         * @param {string} colorClass - Tailwind class for background color (e.g., 'bg-red-500')
+         */
+        function showMessage(message, colorClass = 'bg-red-500') {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            
+            messageText.textContent = message;
+            messageText.className = colorClass + ' text-white font-semibold py-2 px-4 rounded-lg shadow-xl';
+            messageBox.style.opacity = '1';
+            messageBox.style.pointerEvents = 'auto';
+
+            setTimeout(() => {
+                messageBox.style.opacity = '0';
+                messageBox.style.pointerEvents = 'none';
+            }, 3000);
+        }
+
+        /**
+         * Generates and displays a new random quote.
+         */
+        function generateQuote() {
+            if (quotes.length === 0) {
+                showMessage("No quotes available.", 'bg-yellow-500');
+                return;
+            }
+
+            // 1. Determine a new random index that is different from the last one
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * quotes.length);
+            } while (newIndex === lastIndex && quotes.length > 1);
+            
+            lastIndex = newIndex;
+            const quote = quotes[newIndex];
+
+            // 2. Animate out the old quote (optional but nice touch)
+            quoteTextElement.classList.add('quote-enter');
+            quoteAuthorElement.classList.add('quote-enter');
+            
+            // 3. Set a small delay to allow the animation to happen, then update content
+            setTimeout(() => {
+                quoteTextElement.textContent = `"${quote.text}"`;
+                quoteAuthorElement.textContent = `— ${quote.author}`;
+                
+                // 4. Animate in the new quote
+                quoteTextElement.classList.remove('quote-enter');
+                quoteAuthorElement.classList.remove('quote-enter');
+            }, 100); 
+            
+            // 5. Change body background color slightly for visual interest
+            document.body.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 98%)`;
+        }
+
+        // Attach event listener to the button
+        generateBtn.addEventListener('click', generateQuote);
+
+        // Generate the first quote on load
+        window.onload = generateQuote;
+
+    </script>
+</body>
+</html>
